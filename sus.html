@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nestora usability questionnaire</title>
+
+<!-- Font (Plus Jakarta Sans from Google Fonts) and the shared colours and buttons from the main app -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+  /* One question box: padding, and a small gap between its parts */
+  .q { padding: 14px 16px; display: grid; gap: 8px; }
+
+  /* The row of 1-5 answer choices; it wraps onto a new line on small screens */
+  .scale { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* Each answer is a bordered, clickable pill */
+  .scale label { display: flex; gap: 6px; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; min-height: 40px; }
+
+  /* Colour of the round radio button */
+  .scale input { accent-color: var(--action); }
+
+  /* Centre the page and limit its width so the text is easy to read */
+  main { max-width: 760px; margin: 0 auto; padding: 24px 0 60px; display: grid; gap: 12px; }
+</style>
+</head>
+
+<body>
+<main>
+  <h1>How was Nestora?</h1>
+  <p style="margin:0;color:var(--muted)">Rate each statement from 1 (strongly disagree) to 5 (strongly agree). There are no wrong answers.</p>
+
+  <!-- The questions are added here by the script below -->
+  <form id="f" class="grid" style="display:grid;gap:12px"></form>
+
+  <button class="btn" id="go">Get my score</button>
+
+  <!-- The score appears here after the button is clicked; hidden until then -->
+  <div id="out" class="panel" style="padding:18px" hidden></div>
+</main>
+
+<script>
+  /* The 10 statements of the System Usability Scale (SUS).
+     Odd-numbered ones (1, 3, 5, 7, 9) are positive; even-numbered ones (2, 4, 6, 8, 10) are negative. */
+  var Q = [
+    "I think I would like to use this app frequently.",
+    "I found the app unnecessarily complex.",
+    "I thought the app was easy to use.",
+    "I think I would need help from a technical person to use this app.",
+    "I found the various functions in this app were well integrated.",
+    "I thought there was too much inconsistency in this app.",
+    "I imagine most people would learn to use this app very quickly.",
+    "I found the app very awkward to use.",
+    "I felt very confident using the app.",
+    "I needed to learn a lot of things before I could get going with this app."
+  ];
+
+  var f = document.getElementById("f");
+
+  /* Build one box per statement, each with the choices 1 to 5 */
+  Q.forEach(function (q, i) {
+    var d = document.createElement("fieldset");
+    d.className = "panel q";
+    d.style.border = "1px solid var(--line)";
+
+    /* The statement text, then the "Disagree" label */
+    var h = "<legend style='font-weight:700;padding:0 6px'>" + (i + 1) + ". " + q + "</legend><div class='scale'><span class='tiny'>Disagree</span>";
+
+    /* Five radio buttons. All five in a question share the name q0, q1, q2... so only one can be picked */
+    for (var v = 1; v <= 5; v++) h += "<label><input type='radio' name='q" + i + "' value='" + v + "'> " + v + "</label>";
+
+    d.innerHTML = h + "<span class='tiny'>Agree</span></div>";
+    f.appendChild(d);
+  });
+
+  /* When "Get my score" is clicked */
+  document.getElementById("go").onclick = function () {
+    var t = 0;      /* running total of points */
+    var miss = 0;   /* how many statements were left unanswered */
+
+    Q.forEach(function (q, i) {
+      var c = f.querySelector("input[name=q" + i + "]:checked");   /* the chosen answer, if any */
+      if (!c) { miss++; return; }
+      var v = +c.value;                                            /* turn the text "4" into the number 4 */
+
+      /* SUS scoring: positive statements score (answer - 1); negative ones score (5 - answer).
+         Statement 1 is index 0, so even indexes are the positive ones. Each gives 0 to 4 points. */
+      t += (i % 2 === 0) ? v - 1 : 5 - v;
+    });
+
+    var o = document.getElementById("out");
+    o.hidden = false;
+
+    /* Ask for every answer before showing a score */
+    if (miss) { o.innerHTML = "<b>Please answer all 10 statements.</b> " + miss + " left."; return; }
+
+    /* Total (0 to 40) times 2.5 gives the SUS score out of 100 */
+    var s = t * 2.5;
+
+    /* Show the score with a short meaning. 68 is the usual average benchmark for SUS. */
+    o.innerHTML = "<h2 style='font-size:28px'>SUS score: " + s + " / 100</h2><p style='margin:6px 0 0;color:var(--muted)'>" +
+      (s >= 80.3 ? "Excellent." :
+       s >= 68 ? "Above average (68 is the usual benchmark)." :
+       s >= 51 ? "Below average. Look at where people struggled." :
+       "Poor. Fix the biggest blockers and test again.") + "</p>";
+  };
+</script>
+</body>
+</html>
