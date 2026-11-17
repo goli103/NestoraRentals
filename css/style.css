@@ -1,0 +1,475 @@
+/* ==========================================================================
+   Nestora - style.css
+   Next Door Neighbors Group-AP/ITEC 3230 A - Designing User Interfaces Fall 2026-2027
+   Order of this file:
+     1.  Colours and fonts (light and dark themes)
+     2.  Page basics (reset, body, headings, links, focus)
+     3.  Top bar and navigation
+     4.  Buttons
+     5.  Small parts (stars, chips, school line, labels, forms)
+     6.  Nestora Agent card (avatar, states, video, chat bits)
+     7.  Search page (filters, result cards, map)
+     8.  Property page
+     9.  Booking pages (steps, calendar, forms, confirmation)
+    10.  Saved homes and My Tours pages
+    11.  Pop-ups, toast messages, footer
+    12.  Test mode (facilitator panel)
+    13.  Photos
+    14.  Small screens (phones and tablets)
+   Rules that override earlier ones are kept after them on purpose.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. COLOURS AND FONTS
+   Every colour is a variable, so light and dark themes only change values here.
+   ========================================================================== */
+
+/* Light theme (default) */
+:root{
+  --bg:#f4f7f6;                 /* page background */
+  --surface:#ffffff;            /* cards, panels, top bar */
+  --surface-2:#eaf0ee;          /* soft grey-green for hover and quiet areas */
+  --line:#d9e2de;               /* borders and dividers */
+  --text:#18243b;               /* main text (dark navy, from the logo) */
+  --muted:#5a6a77;              /* secondary text */
+  --brand:#2c7a58;              /* Nestora green */
+  --brand-soft:#e0f0e8;         /* light green background */
+  --action:#2060b0;             /* main button blue */
+  --action-hover:#184f94;       /* button blue when hovered */
+  --on-action:#ffffff;          /* text on blue buttons */
+  --star:#e3a21a;               /* filled star */
+  --star-off:#cdd6d2;           /* empty star */
+  --bad:#b83227;                /* error text and borders */
+  --bad-soft:#fdeceb;           /* error background */
+  --good:#2c7a58;               /* success (valid field tick) */
+  /* map colours */
+  --map-water:#cfe3ee; --map-land:#f2f0e9; --map-edge:#d6d0c0; --map-road:#e5c47e; --map-road-c:#ffffff; --map-ink:#8a8474; --map-lake:#5b8aa3;
+  --logo-bg:transparent;        /* white chip behind the logo (only needed in dark mode) */
+  --shadow:0 1px 2px rgba(20,36,59,.06),0 6px 20px rgba(20,36,59,.07);
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
+/* Dark theme when the device is set to dark mode (unless light was chosen) */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1715; --surface:#17211e; --surface-2:#1f2c28; --line:#2c3b36;
+  --text:#e9f0ed; --muted:#9db0a8; --brand:#63c196; --brand-soft:#1d3329;
+  --action:#3f80d6; --action-hover:#5a93e0; --on-action:#ffffff;
+  --star:#f0b93a; --star-off:#41504a; --bad:#ff8a7e; --bad-soft:#3a1f1d; --good:#63c196;
+  --map-water:#1c3340; --map-land:#222b27; --map-edge:#33403a; --map-road:#6b5a33; --map-road-c:#2f3a35; --map-ink:#8c9a92; --map-lake:#6f9db5;
+  --logo-bg:#ffffff; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35); color-scheme:dark}}
+
+/* Dark theme when it is switched on by hand (data-theme="dark") - same values as above */
+:root[data-theme="dark"]{
+  --bg:#0f1715; --surface:#17211e; --surface-2:#1f2c28; --line:#2c3b36;
+  --text:#e9f0ed; --muted:#9db0a8; --brand:#63c196; --brand-soft:#1d3329;
+  --action:#3f80d6; --action-hover:#5a93e0; --on-action:#ffffff;
+  --star:#f0b93a; --star-off:#41504a; --bad:#ff8a7e; --bad-soft:#3a1f1d; --good:#63c196;
+  --map-water:#1c3340; --map-land:#222b27; --map-edge:#33403a; --map-road:#6b5a33; --map-road-c:#2f3a35; --map-ink:#8c9a92; --map-lake:#6f9db5;
+  --logo-bg:#ffffff; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35); color-scheme:dark}
+
+
+/* ==========================================================================
+   2. PAGE BASICS
+   ========================================================================== */
+
+*{box-sizing:border-box}                          /* padding and borders count inside the width */
+
+body{
+  margin:0;
+  background:var(--bg); color:var(--text);
+  font-family:var(--font); font-size:15px; line-height:1.45;
+  /* side gutters of at least 16px, wider on phones with notches */
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 40px;
+}
+/* paints the strip under a phone's status bar so content does not show through */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+
+button,input,select,textarea{font:inherit;color:inherit}   /* form controls use the page font */
+a{color:var(--action)}
+h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance}
+:focus-visible{outline:3px solid var(--action);outline-offset:2px;border-radius:6px}   /* visible keyboard focus */
+
+.wrap{max-width:1320px;margin:0 auto}             /* centres page content */
+.spacer{flex:1}                                   /* pushes items to the far side of a row */
+.center{text-align:center}
+.tiny{font-size:12.5px;color:var(--muted)}        /* small helper text */
+.col{display:flex;flex-direction:column;gap:3px}  /* simple vertical stack */
+
+
+/* ==========================================================================
+   3. TOP BAR AND NAVIGATION
+   ========================================================================== */
+
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:50;     /* stays at the top while scrolling */
+  margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));       /* stretch edge to edge, past the body gutter */
+  padding:0 max(16px,env(safe-area-inset-left,0px));
+  background:var(--surface); border-bottom:1px solid var(--line);
+}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px}
+
+.logo{display:block;background:var(--logo-bg);border-radius:10px;padding:2px 8px;border:0;cursor:pointer}
+.logo img{display:block;height:38px;width:auto}
+
+.nav{display:flex;gap:4px;margin-left:12px}
+.nav a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 12px;border-radius:8px}
+.nav a:hover{background:var(--surface-2);color:var(--text)}
+.nav a[aria-current="page"]{color:var(--text);background:var(--surface-2)}   /* the page you are on */
+.badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--action);color:var(--on-action);font-size:11px;font-weight:800}   /* count next to Saved and My tours */
+
+
+/* ==========================================================================
+   4. BUTTONS
+   .btn is the main blue button; add .alt (outlined), .ghost (plain) or .sm (small)
+   ========================================================================== */
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid transparent;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer;background:var(--action);color:var(--on-action);text-decoration:none;min-height:44px}
+.btn:hover{background:var(--action-hover)}
+.btn.alt{background:var(--surface);color:var(--action);border-color:var(--action)}
+.btn.alt:hover{background:var(--surface-2)}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.sm{padding:7px 12px;min-height:36px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.iconbtn{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center}   /* square button with an icon, such as the pop-up close */
+.replay{background:none;border:0;color:var(--action);text-decoration:underline;cursor:pointer;font:inherit}               /* "Replay intro" text link */
+
+
+/* ==========================================================================
+   5. SMALL PARTS
+   ========================================================================== */
+
+/* Star rating: a row of 5 stars filled up to --p (set in the page, e.g. 94% for 4.7). */
+.stars{
+  --p:90%; display:inline-block; width:84px; height:16px; vertical-align:middle;
+  background:linear-gradient(90deg,var(--star) var(--p),var(--star-off) var(--p));   /* gold up to --p, grey after */
+  /* the star shape is cut out of the colour with a mask (webkit prefix for Safari) */
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l3.1 6.9 7.4.7-5.6 5 1.7 7.4L12 18l-6.6 4 1.7-7.4-5.6-5 7.4-.7z'/%3E%3C/svg%3E") 0 0/16.8px 16px repeat-x;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l3.1 6.9 7.4.7-5.6 5 1.7 7.4L12 18l-6.6 4 1.7-7.4-5.6-5 7.4-.7z'/%3E%3C/svg%3E") 0 0/16.8px 16px repeat-x;
+}
+.rate{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}   /* stars + number of reviews */
+.rate b{color:var(--text)}
+
+/* Green pill label, such as "Verified" and "Zone 9.1/10" */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--brand-soft);color:var(--brand)}
+.chip svg{width:13px;height:13px}
+
+/* School line under each listing */
+.school{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);flex-wrap:wrap}
+.school svg{flex:none;color:var(--brand)}
+
+/* White rounded box used for most panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+/* Text boxes */
+.field{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;min-height:44px}
+.field:focus{outline:none;border-color:var(--action);box-shadow:0 0 0 3px color-mix(in srgb,var(--action) 25%,transparent)}
+.field.bad{border-color:var(--bad);background:var(--bad-soft)}      /* box with an error */
+label.lb{font-size:13px;font-weight:700;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--action)}            /* price slider */
+
+.empty{padding:28px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:14px}   /* "no results yet" message */
+
+
+/* ==========================================================================
+   6. NESTORA AGENT CARD
+   ========================================================================== */
+
+/* Card layout: avatar | name | video, then text, form and chips across the full width */
+.agent{padding:16px;display:grid;grid-template-columns:64px 1fr 132px;gap:6px 14px;align-items:center}
+.agent h2{font-size:17px}
+.agent .say{font-size:14px;color:var(--muted)}                       /* what the agent is saying */
+.agent form{grid-column:1/-1;display:flex;gap:8px;margin-top:6px}    /* question box + Ask button */
+.avst{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--muted);vertical-align:2px;margin-left:6px}   /* state label: Idle, Listening... */
+
+.chips{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}        /* example questions */
+.chips button{border:1px solid var(--line);background:var(--surface-2);border-radius:99px;padding:5px 11px;font-size:13px;cursor:pointer;color:var(--text)}
+.chips button:hover{border-color:var(--action)}
+.chips .play{background:var(--brand-soft);color:var(--brand);border-color:transparent;font-weight:700}   /* "Play sequence" button */
+.reply{grid-column:1/-1;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}  /* agent's answer */
+
+/* Avatar: the image, a ring around it (::after) and a sparkle (::before) */
+.avatar{position:relative;width:64px;height:64px}
+.avatar img{width:64px;height:64px;display:block;border-radius:50%;transform-origin:50% 80%;animation:bob 4.5s ease-in-out infinite}   /* idle: floats gently */
+.avatar::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:3px solid var(--brand);opacity:0;transform:scale(.9)}   /* ring, hidden until a state shows it */
+.avatar::before{content:"\2726";position:absolute;right:-6px;top:-6px;font-size:20px;color:var(--star);opacity:0;z-index:2}              /* sparkle, shown when happy */
+
+/* Avatar states (class is set by the script: st-idle, st-listening, st-thinking, st-speaking, st-happy) */
+.st-listening img{animation:tilt 1.8s ease-in-out infinite}                                      /* tilts while the person types */
+.st-listening::after{opacity:.8;transform:scale(1);border-color:var(--brand);animation:none}     /* steady green ring */
+.st-thinking img{animation:wob .8s ease-in-out infinite}                                         /* wobbles while searching */
+.st-thinking::after{animation:ring 1.1s ease-out infinite}                                        /* pulsing ring */
+.st-speaking img{animation:talk .36s ease-in-out infinite alternate}                              /* squishes while "talking" */
+.st-speaking::after{border-color:var(--action);animation:ring 1.4s ease-out infinite}             /* blue ring */
+.st-happy img{animation:hop .6s ease-out 2}                                                       /* hops twice */
+.st-happy::before{animation:spark 1.2s ease-out 2}                                                /* sparkle */
+.st-happy::after{border-color:var(--star);animation:ring 1.1s ease-out 2}                         /* gold ring */
+
+/* Animations used by the avatar */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes ring{0%{opacity:.8;transform:scale(.9)}100%{opacity:0;transform:scale(1.25)}}
+@keyframes tilt{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes wob{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-3px)}}
+@keyframes talk{from{transform:scale(1,1)}to{transform:scale(1.04,.95)}}
+@keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-12px) scale(1.05)}100%{transform:translateY(0)}}
+@keyframes spark{0%{opacity:0;transform:translate(0,6px) scale(.5)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-10px) scale(1.2)}}
+
+/* Nesti welcome video in the card's top-right corner */
+.nv{position:relative;width:132px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#cfe6df;border:1.5px solid var(--line)}
+.nv[hidden]{display:none}                                      /* hidden if the video cannot play */
+.nv video{display:block;width:100%;height:100%;object-fit:cover}
+.nvp{position:absolute;inset:0;display:grid;place-items:center;border:0;background:rgba(10,30,24,.28);color:#fff;font-size:20px;cursor:pointer}   /* play button over the video */
+.nv.on .nvp{display:none}                                      /* hide it while the video plays */
+.nvs{position:absolute;right:4px;bottom:4px;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:#18243b;cursor:pointer;display:none;place-items:center}   /* small sound button */
+.nv.on .nvs{display:grid}                                      /* show it only while the video plays */
+
+/* People who prefer less motion: turn the avatar animation off (keep the sparkle visible when happy) */
+@media (prefers-reduced-motion:reduce){
+  .avatar img,.avatar::before,.avatar::after{animation:none!important}
+  .st-happy::before{opacity:1}
+}
+
+
+/* ==========================================================================
+   7. SEARCH PAGE
+   ========================================================================== */
+
+/* Two columns: results on the left, map on the right */
+.home{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;padding-top:20px;align-items:start}
+
+/* Filters panel */
+.filters{padding:14px 16px;margin-top:14px;display:grid;gap:12px}
+.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}     /* Studio / 1 / 2 / 3+ buttons */
+.seg button{border:0;background:var(--surface);padding:8px 13px;cursor:pointer;font-weight:600;min-height:40px}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--action);color:var(--on-action)}                 /* chosen option */
+
+/* "6 homes found" row with the sort menu */
+.resbar{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 10px}
+.resbar select{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px}
+
+/* Result cards */
+.cards{display:grid;gap:12px}
+.card{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;text-align:left;width:100%;transition:border-color .15s,box-shadow .15s}
+.card:hover,.card.on{border-color:var(--action);box-shadow:var(--shadow)}      /* hovered or picked on the map */
+.card .ph{border-radius:10px;overflow:hidden;position:relative;min-height:128px}   /* picture box */
+.card .ph svg{position:absolute;inset:0;width:100%;height:100%}
+.card h3{font-size:16px}
+.card .col{display:flex;flex-direction:column;gap:5px;min-width:0}
+.price{font-weight:800;font-size:18px}
+.price small{font-weight:500;color:var(--muted);font-size:13px}
+.facts{font-size:13.5px;color:var(--muted)}                                     /* beds, baths, size, area */
+.heart{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.92);display:grid;place-items:center;cursor:pointer;color:#18243b}   /* save button on a card */
+.heart[aria-pressed="true"]{color:#d0342c}                                      /* saved = red */
+.heart svg{fill:none;stroke:currentColor;stroke-width:2.4}                      /* outline heart... */
+.heart[aria-pressed="true"] svg{fill:currentColor}                              /* ...filled when saved */
+
+/* Map: sticks to the screen while the list scrolls */
+.mapbox{position:sticky;top:calc(84px + env(safe-area-inset-top,0px));height:calc(100vh - 110px);min-height:480px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--map-water)}
+.mapbox>svg{width:100%;height:100%;display:block}
+.m-water{fill:var(--map-water)}
+.m-land{fill:var(--map-land);stroke:var(--map-edge);stroke-width:.9;stroke-linejoin:round;fill-rule:evenodd}   /* neighbourhoods */
+.m-road-c{fill:none;stroke:var(--map-road-c);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}      /* road outline */
+.m-road{fill:none;stroke:var(--map-road);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}          /* road centre line */
+.m-lbl{font:600 9px var(--font);letter-spacing:.7px;fill:var(--map-ink);text-anchor:middle}                  /* neighbourhood names */
+.m-st{font:600 8.5px var(--font);fill:var(--map-ink);paint-order:stroke;stroke:var(--map-land);stroke-width:2.6}   /* street names */
+.m-lake{font:italic 600 11px var(--font);fill:var(--map-lake);letter-spacing:1px}                            /* "Lake Ontario" */
+
+/* Price pins on the map */
+.pin{cursor:pointer}
+.pin rect{fill:var(--surface);stroke:var(--text);stroke-width:1.4}
+.pin text{font:800 11px var(--font);fill:var(--text);text-anchor:middle}
+.pin .tail{fill:var(--surface);stroke:var(--text);stroke-width:1.4}                  /* small point under the pin */
+.pin.on rect,.pin:hover rect{fill:var(--action);stroke:var(--action)}                /* picked or hovered pin turns blue */
+.pin.on text,.pin:hover text{fill:var(--on-action)}
+.pin.on .tail,.pin:hover .tail{fill:var(--action);stroke:var(--action)}
+
+.mapctl{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}   /* zoom + and - */
+.mapctl button{width:38px;height:38px;border:0;background:var(--surface);font-size:20px;cursor:pointer}
+.mapctl button+button{border-top:1px solid var(--line)}
+.attr{position:absolute;left:8px;bottom:6px;font-size:11px;background:color-mix(in srgb,var(--surface) 85%,transparent);padding:1px 6px;border-radius:4px;color:var(--muted)}   /* map credit */
+
+/* Small card that opens when a pin is clicked */
+.pop{position:absolute;left:12px;right:12px;bottom:34px;display:grid;grid-template-columns:96px 1fr auto;gap:12px;padding:10px;align-items:center;max-width:460px}
+.pop .ph{height:72px;border-radius:8px;overflow:hidden;position:relative}
+.pop .ph svg{position:absolute;inset:0;width:100%;height:100%}
+
+
+/* ==========================================================================
+   8. PROPERTY PAGE
+   ========================================================================== */
+
+.page{padding-top:20px}                                                  /* used by property, booking, saved and tours pages */
+.crumb{display:flex;align-items:center;gap:10px;margin-bottom:14px}      /* "Back to results" row */
+.two{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}   /* main column + side card */
+.sticky{position:sticky;top:calc(84px + env(safe-area-inset-top,0px))}   /* side card stays in view */
+.side{padding:18px;display:grid;gap:12px}                                /* price, tour and contact buttons */
+
+/* Photo gallery: one large photo and two small ones */
+.gal{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:380px;border-radius:16px;overflow:hidden}
+.gal>div{position:relative;overflow:hidden}
+.gal>div:first-child{grid-row:1/3}                                       /* large photo spans both rows */
+.gal svg{position:absolute;inset:0;width:100%;height:100%}
+
+.sec{margin-top:26px}                                                    /* a section of the page */
+.sec h2{font-size:20px;margin-bottom:12px}
+.kd{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}   /* key details boxes */
+.kd div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.kd b{display:block;font-size:20px}
+.kd span{font-size:13px;color:var(--muted)}
+.am{display:flex;flex-wrap:wrap;gap:8px}                                 /* amenities */
+.am span{background:var(--surface);border:1px solid var(--line);padding:6px 12px;border-radius:99px;font-size:14px}
+
+/* School locator: mini map on the left, school list on the right */
+.sl{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+.sl .mini{border-radius:12px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3}
+.sl .mini svg{width:100%;height:100%;display:block}
+.spin circle{fill:#d98b2b;stroke:#fff;stroke-width:2}                                                         /* school marker */
+.spin text{font:700 9px var(--font);fill:var(--text);paint-order:stroke;stroke:var(--map-land);stroke-width:2.4}   /* its number */
+.srow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.srow:last-child{border:0}
+.score{font-weight:800;color:var(--brand)}
+.zone{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--brand-soft);color:var(--brand);border-radius:12px;padding:10px 14px;font-weight:700;margin-bottom:8px}   /* school zone score bar */
+
+.rev{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}   /* one review */
+
+
+/* ==========================================================================
+   9. BOOKING PAGES
+   ========================================================================== */
+
+/* Progress steps across the top: 1 Select Date, 2 Confirm Details, 3 Confirmation */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.steps div{padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1.5px solid transparent;font-weight:600;color:var(--muted);display:flex;gap:10px;align-items:center}
+.steps i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1.5px solid var(--line);font-size:13px;flex:none}   /* step number circle */
+.steps .cur{border-color:var(--action);background:var(--surface);color:var(--text)}                         /* current step */
+.steps .cur i{background:var(--action);color:var(--on-action);border-color:var(--action)}
+.steps .done{color:var(--text)}                                                                              /* finished step */
+.steps .done i{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+.form{padding:22px;display:grid;gap:16px}
+.form h2{font-size:22px}
+
+/* Calendar */
+.cal{border:1.5px solid var(--line);border-radius:14px;padding:12px}
+.calh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700}   /* month name and arrows */
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}                          /* 7 days a week */
+.grid7 .dow{font-size:12px;color:var(--muted);font-weight:700;padding:4px 0}                                 /* Su Mo Tu... */
+.day{height:44px;border:0;border-radius:10px;background:var(--surface-2);cursor:pointer;font-weight:600;min-height:40px}
+.day:hover:not([disabled]){outline:2px solid var(--action)}
+.day[disabled]{background:transparent;color:var(--muted);opacity:.4;cursor:not-allowed}                      /* past days and Sundays */
+.day[aria-pressed="true"]{background:var(--action);color:var(--on-action)}                                   /* chosen day */
+
+/* Time slots */
+.slots{display:flex;gap:8px;flex-wrap:wrap}
+.slot{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;min-height:40px}
+.slot[aria-pressed="true"]{border-color:var(--action);background:var(--action);color:var(--on-action)}
+.slot[disabled]{opacity:.4;text-decoration:line-through;cursor:not-allowed}                                  /* taken time */
+
+/* Form fields with checking */
+.ff{display:grid;gap:5px}                                           /* label + box + message */
+.ff label{font-size:14px;font-weight:700}
+.msg{font-size:13px;color:var(--bad);display:flex;gap:6px;align-items:center;min-height:0}   /* error message under a field */
+.tick{position:relative}
+.tick .ok{position:absolute;right:12px;top:12px;color:var(--good);display:none}              /* green tick, hidden until valid */
+.tick.valid .ok{display:block}
+.tick.valid .field{border-color:var(--good)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}                                     /* two fields side by side */
+
+/* Summary and confirmation */
+.sum{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center}                 /* property summary in the side card */
+.sum .ph{height:72px;border-radius:10px;overflow:hidden;position:relative}
+.sum .ph svg{position:absolute;inset:0;width:100%;height:100%}
+.when{border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}   /* date and time box */
+.actions{display:flex;gap:10px;flex-wrap:wrap}                                                 /* row of buttons */
+.actions .grow{flex:1}
+.okbig{width:84px;height:84px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;margin:0 auto;color:var(--brand)}   /* big green tick */
+.next{display:grid;gap:10px}                                                                   /* "What happens next" list */
+.next div{display:flex;gap:12px;align-items:flex-start}
+.next i{font-style:normal;flex:none;width:26px;height:26px;border-radius:50%;background:var(--action);color:var(--on-action);display:grid;place-items:center;font-size:13px;font-weight:700}
+
+
+/* ==========================================================================
+   10. SAVED HOMES AND MY TOURS
+   ========================================================================== */
+
+.grid2{grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr))}   /* saved cards in as many columns as fit */
+.tlist{display:grid;gap:12px}
+.trow{display:grid;grid-template-columns:120px 1fr auto;gap:14px;padding:12px;align-items:center}   /* one tour */
+.trow .ph{height:88px;border-radius:10px;overflow:hidden;position:relative}
+.trow .ph svg{position:absolute;inset:0;width:100%;height:100%}
+.trow.off{opacity:.65}                                           /* cancelled tour */
+.st-cancelled{background:var(--bad-soft);color:var(--bad)}       /* status chips (come after .chip so they win) */
+.st-rescheduled{background:var(--surface-2);color:var(--text)}
+
+
+/* ==========================================================================
+   11. POP-UPS, TOAST MESSAGES, FOOTER
+   ========================================================================== */
+
+.scrim{position:fixed;inset:0;background:rgba(10,18,16,.55);display:grid;place-items:center;padding:16px;z-index:80;overflow:auto}   /* dark layer behind a pop-up */
+.modal{width:100%;max-width:460px;padding:22px;display:grid;gap:14px;background:var(--surface);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.mh{display:flex;justify-content:space-between;align-items:center}   /* pop-up title and close button */
+.mh h2{font-size:22px}
+.who{display:flex;gap:12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}   /* landlord name row */
+.who .ava{width:44px;height:44px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:800}   /* landlord initials */
+
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:90;font-weight:600;box-shadow:var(--shadow)}   /* short message at the bottom */
+
+.foot{margin-top:36px;font-size:12.5px;color:var(--muted);text-align:center}
+
+
+/* ==========================================================================
+   12. TEST MODE (facilitator panel; the button is hidden from testers)
+   ========================================================================== */
+
+.tbtn{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:70;opacity:.75}
+.tbtn[hidden]{display:none}                                      /* hidden until the facilitator shows it */
+#tpanel{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:max(56px,calc(env(safe-area-inset-bottom,0px) + 52px));z-index:70;width:min(440px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:grid;gap:10px}
+#tpanel[hidden]{display:none}
+.tl{margin:0;padding:0;list-style:none;display:grid;gap:10px}     /* task list */
+.tt{display:grid;gap:6px;padding:10px;border:1px solid var(--line);border-radius:10px}   /* one task */
+
+
+/* ==========================================================================
+   13. PHOTOS
+   Real photos fill their box like the drawn pictures do.
+   ========================================================================== */
+
+.ph img,.gal img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+
+
+/* ==========================================================================
+   14. SMALL SCREENS
+   Kept last so these rules override the ones above.
+   ========================================================================== */
+
+/* Tablets and narrow windows */
+@media (max-width:1000px){
+  .home{grid-template-columns:minmax(0,1fr)}                     /* one column: map first, then list */
+  .mapbox{position:relative;top:0;height:380px;min-height:0;order:-1}
+  .two{grid-template-columns:minmax(0,1fr)}                      /* side card goes under the main column */
+  .sticky{position:static}
+  .nav{display:none}                                             /* hide the top links */
+}
+
+/* Phones */
+@media (max-width:620px){
+  .card{grid-template-columns:1fr}.card .ph{height:150px}        /* picture above the text */
+  .gal{height:240px;grid-template-columns:1fr;grid-template-rows:1fr}.gal>div:not(:first-child){display:none}.gal>div:first-child{grid-row:auto}   /* only the large photo */
+  .sl,.row2{grid-template-columns:1fr}
+  .steps div span{display:none}                                  /* step numbers only, no names */
+  .pop{grid-template-columns:72px 1fr}.pop .btn{grid-column:1/-1}
+  .trow{grid-template-columns:1fr}.trow .col{align-items:flex-start!important}
+}
+
+/* Very small phones: the video moves under the avatar */
+@media (max-width:420px){
+  .agent{grid-template-columns:64px 1fr}
+  .nv{grid-column:1/-1;width:100%}
+}
