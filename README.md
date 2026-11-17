@@ -1,5 +1,5 @@
 # Nestora (High Fidelity prototype)
-
+![Nestora home page](assets/appview.png)
 
 A working front-end for the Nestora rental app.  it is in Plain HTML, CSS and JavaScript. 
  # By next Door Neighbors Group AP/ITEC 3230 A - Designing User Interfaces Fall 2026-2027
