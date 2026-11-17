@@ -1,9 +1,10 @@
 # Nestora (High Fidelity prototype)
 
+
 A working front-end for the Nestora rental app.  it is in Plain HTML, CSS and JavaScript. 
  # By next Door Neighbors Group AP/ITEC 3230 A - Designing User Interfaces Fall 2026-2027
 ## Run it
-Open `index.html` in Chrome, Edge or Firefox (double-click it). To share it with a tester, upload the whole folder to Netlify Drop, GitHub Pages or any static host.
+Open `index.html` in Chrome, Edge or Firefox (double-click it). 
 
 ## What works
 - Search page with real filtering, sorting and a Toronto map with price pins.
