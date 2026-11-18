@@ -21,7 +21,7 @@ function home() {
     '<aside class="mapbox" aria-label="Map of results"><svg id="map" viewBox="0 0 640 720" preserveAspectRatio="xMidYMid slice"><use href="#basemap"/><g id="pins"></g></svg>' +
     '<div class="mapctl"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">&minus;</button></div>' +
     '<div class="attr">Neighbourhoods: City of Toronto open data. Streets approximate.</div><div id="pop"></div></aside></div>' +
-   '<p class="foot"> Our High Fidelity Prototype with sample listings, schools and ratings. Photos  are samples from real world but with a different name .<a class="replay" href="sus.html">Take the usability survey (SUS)</a></p>';
+   '<p class="foot"> Our High Fidelity Prototype with sample listings, schools and ratings. Photos  are samples from real world but with a different name .<a class="replay" href="sus.html" target="_blank" rel="noopener">Take the usability survey (SUS)</a></p>';
   // Example questions shown under the agent box.
   var ch = ["2-bed downtown under $2500", "studio under 1800", "best schools, 3 bedrooms"];
   $("#achips").innerHTML = ch
